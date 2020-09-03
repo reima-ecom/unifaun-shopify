@@ -53,7 +53,7 @@ for await (const req of server) {
     .then(attachHSCodes)
     .then(log("Ready shipment:"))
     .then(toUnifaunDto)
-    // .then(createUnifaunShipment)
+    .then(createUnifaunShipment)
     .then(log("Created shipment:"));
 
   req.respond({ body: "Ok" });

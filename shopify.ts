@@ -82,7 +82,7 @@ export const getVerifyRequestAndDeserialize = (secret: string) =>
 
 export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
   async (productId: LegacyId): Promise<HSCode[]> => {
-    console.warn("WARNING! Getting dummy HS Code!");
+    console.log("Getting tags for product", productId);
     const response = await fetch(
       `https://${shopifyShop}.myshopify.com/admin/api/2020-07/products/${productId}.json?fields=tags`,
       {
@@ -92,9 +92,12 @@ export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
       },
     );
     if (!response.ok) throw new Error(`Could not get HS Code`);
-    const obj: { product: { tags: string[] } } = await response.json();
+    // tags are comma-separated
+    // https://shopify.dev/docs/admin-api/rest/reference/products/product
+    const obj: { product: { tags: string } } = await response.json();
     const { product: { tags } } = obj;
     return tags
+      .split(", ")
       .filter((tag) => tag.startsWith("HS:"))
       .map((tag) => {
         const [, country, statNo, subStatNo1, subStatNo2, contents, count] = tag
