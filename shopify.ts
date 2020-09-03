@@ -1,4 +1,5 @@
 import { ServerRequest, HmacSha256 } from "./deps.ts";
+import { HSCode } from "./domain.ts";
 
 type LegacyId = number;
 type AdminGraphQlId = string;
@@ -77,4 +78,34 @@ export const getVerifyRequestAndDeserialize = (secret: string) =>
 
     const body = new TextDecoder().decode(buf);
     return JSON.parse(body);
+  };
+
+export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
+  async (productId: LegacyId): Promise<HSCode[]> => {
+    console.warn("WARNING! Getting dummy HS Code!");
+    const response = await fetch(
+      `https://${shopifyShop}.myshopify.com/admin/api/2020-07/products/${productId}.json?fields=tags`,
+      {
+        headers: {
+          "Authorization": `Basic ${shopifyAuth}`,
+        },
+      },
+    );
+    if (!response.ok) throw new Error(`Could not get HS Code`);
+    const obj: { product: { tags: string[] } } = await response.json();
+    const { product: { tags } } = obj;
+    return tags
+      .filter((tag) => tag.startsWith("HS:"))
+      .map((tag) => {
+        const [, country, statNo, subStatNo1, subStatNo2, contents, count] = tag
+          .split(":");
+        return <HSCode> {
+          contents,
+          statNo,
+          subStatNo1,
+          subStatNo2,
+          count: count ? Number.parseInt(count) : 1,
+          originCountryCode: country,
+        };
+      });
   };

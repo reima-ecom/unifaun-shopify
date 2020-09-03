@@ -7,6 +7,7 @@ export type HSCode = {
   subStatNo2?: string;
   contents: string;
   count: number;
+  originCountryCode: string;
 };
 
 type Sender = string;
@@ -20,24 +21,41 @@ type ReceiverAddress = {
 };
 type ShippingService = string;
 type WeightKg = number;
+type LineItem = {
+  productId: number;
+  variantId: number;
+  quantity: number;
+};
 
 export type Shipment = {
   receiver: ReceiverAddress;
   orderNo: string;
   weight: WeightKg;
   email: string;
+  lineItems: LineItem[];
+  currency: string;
   test?: boolean;
+  sender?: Sender;
+  service?: ShippingService;
+  description?: string;
+  hsCodes?: HSCode[];
 };
 
 export type ShipmentReady = Shipment & {
   sender: Sender;
   service: ShippingService;
   description: string;
+  hsCodes: HSCode[];
 };
 
 export const fromShopifyDto = (order: ShopifyOrderWebhook): Shipment => ({
   email: order.email,
   orderNo: order.name,
+  lineItems: order.line_items.map((line) => ({
+    variantId: line.variant_id,
+    productId: line.product_id,
+    quantity: line.quantity,
+  })),
   receiver: {
     name: order.shipping_address.name,
     address1: order.shipping_address.address1,
@@ -47,6 +65,7 @@ export const fromShopifyDto = (order: ShopifyOrderWebhook): Shipment => ({
     countryCode: order.shipping_address.country_code,
   },
   weight: order.total_weight,
+  currency: order.currency,
   test: order.test,
 });
 
@@ -54,12 +73,23 @@ export const getShipmentProcessor = (
   senderId: string,
   serviceId: string,
   description: string,
-) => (shipment: Shipment): ShipmentReady => ({
-  ...shipment,
-  sender: senderId,
-  service: serviceId,
-  description: description,
-});
+) =>
+  <T extends Shipment>(shipment: T) => ({
+    ...shipment,
+    sender: senderId,
+    service: serviceId,
+    description: description,
+  });
+
+export const getAttachHSCodes = (
+  hsCodeGetter: (id: number) => Promise<HSCode[]>,
+) =>
+  async <T extends Shipment>(shipment: T) => ({
+    ...shipment,
+    hsCodes: (await Promise.all(
+      shipment.lineItems.map((line) => hsCodeGetter(line.productId)),
+    )).flat(),
+  });
 
 export const toUnifaunDto = (
   shipment: ShipmentReady,
@@ -85,5 +115,25 @@ export const toUnifaunDto = (
     weight: shipment.weight,
   }],
   senderReference: shipment.email,
+  customsDeclaration: {
+    currencyCode: shipment.currency,
+    declarant: "Reima Oy",
+    declarantCity: "Vantaa, Finland",
+    jobTitle: "",
+    invoiceNo: shipment.orderNo,
+    invoiceType: "STANDARD",
+    termCode: "022",
+    lines: shipment.hsCodes.map((hsCode) => ({
+      contents: hsCode.contents,
+      statNo: hsCode.statNo,
+      subStatNo1: hsCode.subStatNo1 || null,
+      subStatNo2: hsCode.subStatNo2 || null,
+      sourceCountryCode: hsCode.originCountryCode,
+      copies: hsCode.count,
+      valuesPerItem: false,
+    })),
+    declarantDate: new Date().toLocaleDateString("fi"),
+    printSet: ["proformaposti", "cn23posti"],
+  },
   test: shipment.test,
 });

@@ -15,7 +15,9 @@
         "UNIFAUN_TOKEN": "${localEnv:UNIFAUN_TOKEN}",
         "UNIFAUN_SENDER": "1",
         "UNIFAUN_SERVICE": "PO2017",
-        "SHOPIFY_WEBHOOK_SECRET": "${localEnv:SHOPIFY_WEBHOOK_SECRET}"
+        "SHOPIFY_WEBHOOK_SECRET": "${localEnv:SHOPIFY_WEBHOOK_SECRET}",
+        "SHOPIFY_BASIC_AUTH": "${localEnv:SHOPIFY_BASIC_AUTH_FBB}",
+        "SHOPIFY_SHOP": "reima-fbb",
     },
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     "forwardPorts": [

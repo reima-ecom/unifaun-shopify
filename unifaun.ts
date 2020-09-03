@@ -14,14 +14,14 @@ export type ShippingService = {
 };
 
 type CustomsDeclarationLine = {
+  valuesPerItem: boolean;
   contents: string;
   statNo: string;
   subStatNo1: string | null;
   sourceCountryCode: string;
   copies: number;
-  value: number;
-  netWeight: number;
-  valuesPerItem: boolean;
+  value?: number;
+  netWeight?: number;
 };
 
 type CustomsDeclaration = {
@@ -58,7 +58,7 @@ export type UnifaunShipment = {
   senderReference: string;
   goodsDescription: string;
   parcels: Parcel[];
-  customsDeclaration?: CustomsDeclaration;
+  customsDeclaration: CustomsDeclaration;
   test?: boolean;
 };
 
