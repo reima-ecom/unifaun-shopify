@@ -8,6 +8,7 @@ export type HSCode = {
   contents: string;
   count: number;
   originCountryCode: string;
+  weight?: number;
 };
 
 type Sender = string;
@@ -131,6 +132,7 @@ export const toUnifaunDto = (
       sourceCountryCode: hsCode.originCountryCode,
       copies: hsCode.count,
       valuesPerItem: false,
+      netWeight: hsCode.weight,
     })),
     declarantDate: new Date().toLocaleDateString("fi"),
     printSet: ["proformaposti", "cn23posti"],

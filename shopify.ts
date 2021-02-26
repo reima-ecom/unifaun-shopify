@@ -99,7 +99,7 @@ export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
       .split(", ")
       .filter((tag) => tag.startsWith("HS:"))
       .map((tag) => {
-        const [, country, statNo, subStatNo1, subStatNo2, contents, count] = tag
+        const [, country, statNo, subStatNo1, subStatNo2, contents, count, weight] = tag
           .split(":");
         return <HSCode> {
           contents,
@@ -108,6 +108,7 @@ export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
           subStatNo2,
           count: count ? Number.parseInt(count) : 1,
           originCountryCode: country,
+          weight: weight ? Number.parseInt(weight) : undefined,
         };
       });
   };
