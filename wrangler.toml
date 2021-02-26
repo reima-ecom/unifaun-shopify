@@ -2,3 +2,5 @@ name = "unifaun-shopify"
 type = "javascript"
 account_id = "25fd4a605fa32029740e7374ebb26cab"
 workers_dev = true
+
+vars = { UNIFAUN_SENDER = "1", UNIFAUN_SERVICE = "PO2017", SHOPIFY_SHOP = "reima-fbb" }
