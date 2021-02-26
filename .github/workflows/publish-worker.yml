@@ -1,0 +1,19 @@
+name: Publish worker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-worker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: denolib/setup-deno@v2
+    - name: Bundle worker with redirects
+      run: deno bundle sw.ts sw.js
+    - name: Publish
+      uses: cloudflare/wrangler-action@1.3.0
+      with:
+        apiToken: ${{ secrets.CF_API_TOKEN }}

@@ -1,4 +1,4 @@
-import { ServerRequest, HmacSha256 } from "./deps.ts";
+import { HmacSha256 } from "./deps.ts";
 import { HSCode } from "./domain.ts";
 
 type LegacyId = number;
@@ -63,9 +63,9 @@ export type ShopifyOrderWebhook = {
 };
 
 export const getVerifyRequestAndDeserialize = (secret: string) =>
-  async (req: ServerRequest): Promise<ShopifyOrderWebhook> => {
-    const buf: Uint8Array = await Deno.readAll(req.body);
-    const hmac = new HmacSha256(secret).update(buf.buffer);
+  async (req: Request): Promise<ShopifyOrderWebhook> => {
+    const body = await req.text();
+    const hmac = new HmacSha256(secret).update(body);
     // const hmacBase64 = btoa(hmac.hex());
     const hmacHeader = req.headers.get("X-Shopify-Hmac-SHA256");
     const hmacBase64 = btoa(
@@ -76,7 +76,6 @@ export const getVerifyRequestAndDeserialize = (secret: string) =>
       throw new Error("Could not verify webhook came from Shopify");
     }
 
-    const body = new TextDecoder().decode(buf);
     return JSON.parse(body);
   };
 
