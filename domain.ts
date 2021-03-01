@@ -65,7 +65,7 @@ export const fromShopifyDto = (order: ShopifyOrderWebhook): Shipment => ({
     city: order.shipping_address.city,
     countryCode: order.shipping_address.country_code,
   },
-  weight: order.total_weight,
+  weight: Number.parseInt(order.total_weight) / 1000,
   currency: order.currency,
   test: order.test,
 });

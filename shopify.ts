@@ -5,8 +5,7 @@ type LegacyId = number;
 type AdminGraphQlId = string;
 type Email = string;
 type PriceString = string;
-type Weight = number;
-type WeightGrams = number;
+type WeightGrams = string;
 type Currency = string;
 type OrderNumber = string;
 
@@ -49,7 +48,7 @@ export type ShopifyOrderWebhook = {
   email: Email;
   total_price: PriceString;
   subtotal_price: PriceString;
-  total_weight: Weight;
+  total_weight: WeightGrams;
   total_tax: PriceString;
   taxes_included: boolean;
   currency: Currency;
@@ -108,7 +107,7 @@ export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
           subStatNo2,
           count: count ? Number.parseInt(count) : 1,
           originCountryCode: country,
-          weight: weight ? Number.parseInt(weight) : undefined,
+          weight: weight ? Number.parseFloat(weight) : undefined,
         };
       });
   };
