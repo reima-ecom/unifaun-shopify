@@ -17,6 +17,8 @@ HS:[COUNTRY]:[STATNO]:[SUBSTATNO1?]:[SUBSTATNO2?]:[CONTENTS]:[COUNT?]:[WEIGHT?]
 
 The tag should always begin with `HS:` and then list the properties in the specified order. Properties with a `?` suffix are optional, but please still include the required `:` separators. Count is assumed to be one if left blank.
 
+**Please use a period `.` as a decimal point for the weight.**
+
 Example of a tag specifying 22 counts of baby clothes (note that SUBSTATNO2 and weight is left blank):
 
 ```
