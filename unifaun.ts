@@ -20,8 +20,8 @@ type CustomsDeclarationLine = {
   subStatNo1: string | null;
   sourceCountryCode: string;
   copies: number;
-  value?: number;
-  netWeight?: number;
+  value: number;
+  netWeight: number;
 };
 
 type CustomsDeclaration = {

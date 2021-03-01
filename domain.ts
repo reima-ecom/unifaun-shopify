@@ -25,6 +25,7 @@ type WeightKg = number;
 type LineItem = {
   productId: number;
   variantId: number;
+  price: number;
   quantity: number;
 };
 
@@ -32,6 +33,7 @@ export type Shipment = {
   receiver: ReceiverAddress;
   orderNo: string;
   weight: WeightKg;
+  value: number;
   email: string;
   lineItems: LineItem[];
   currency: string;
@@ -55,6 +57,7 @@ export const fromShopifyDto = (order: ShopifyOrderWebhook): Shipment => ({
   lineItems: order.line_items.map((line) => ({
     variantId: line.variant_id,
     productId: line.product_id,
+    price: Number.parseFloat(line.price),
     quantity: line.quantity,
   })),
   receiver: {
@@ -67,6 +70,7 @@ export const fromShopifyDto = (order: ShopifyOrderWebhook): Shipment => ({
   },
   weight: Number.parseInt(order.total_weight) / 1000,
   currency: order.currency,
+  value: Number.parseFloat(order.total_line_items_price),
   test: order.test,
 });
 
@@ -91,6 +95,11 @@ export const getAttachHSCodes = (
       shipment.lineItems.map((line) => hsCodeGetter(line.productId)),
     )).flat(),
   });
+
+const valuePerItem = (
+  shipment: ShipmentReady,
+) => (shipment.value /
+  shipment.hsCodes.reduce((total, h) => total + h.count, 0));
 
 export const toUnifaunDto = (
   shipment: ShipmentReady,
@@ -131,8 +140,9 @@ export const toUnifaunDto = (
       subStatNo2: hsCode.subStatNo2 || null,
       sourceCountryCode: hsCode.originCountryCode,
       copies: hsCode.count,
-      valuesPerItem: false,
-      netWeight: hsCode.weight,
+      valuesPerItem: true,
+      value: valuePerItem(shipment),
+      netWeight: hsCode.weight || 0,
     })),
     declarantDate: new Date().toLocaleDateString("fi"),
     printSet: ["proformaposti", "cn23posti"],
