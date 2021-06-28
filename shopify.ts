@@ -89,7 +89,7 @@ export const getGetHSCodes = (shopifyShop: string, shopifyAuth: string) =>
         },
       },
     );
-    if (!response.ok) throw new Error(`Could not get HS Code`);
+    if (!response.ok) throw new Error(`Could not get HS Code, status ${response.status}`);
     // tags are comma-separated
     // https://shopify.dev/docs/admin-api/rest/reference/products/product
     const obj: { product: { tags: string } } = await response.json();
