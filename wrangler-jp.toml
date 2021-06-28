@@ -1,0 +1,12 @@
+name = "unifaun-shopify-fbb-jp"
+type = "javascript"
+account_id = "25fd4a605fa32029740e7374ebb26cab"
+workers_dev = true
+
+vars = { UNIFAUN_SENDER = "1", UNIFAUN_SERVICE = "PO2017", SHOPIFY_SHOP = "finnish-baby-box-japan" }
+
+[build]
+command = "deno bundle sw.ts sw.js"
+
+[build.upload]
+format = "service-worker"
